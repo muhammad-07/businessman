@@ -14,7 +14,10 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        return view('welcome');
+        $data = Payment::latest()->paginate(5);
+    
+        return view('welcome',compact('data'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
     /**
