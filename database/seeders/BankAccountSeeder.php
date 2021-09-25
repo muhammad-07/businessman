@@ -49,10 +49,10 @@ class BankAccountSeeder extends Seeder
 
         foreach ($bank_codes as $bank_codes_key => $bank_code) {
             BankAccount::create([
-                'code' => $bank_code,
-                'name' => $bank_names[$bank_codes_key],
-                'ac_no' => $account_numbers[$bank_codes_key],
-                'opening_balance' => (float)$opening_balances[$bank_codes_key]
+                'code' => trim($bank_code),
+                'name' => trim($bank_names[$bank_codes_key]),
+                'ac_no' => trim($account_numbers[$bank_codes_key]),
+                'opening_balance' => trim((float)$opening_balances[$bank_codes_key])
             ]);
         }
     }
