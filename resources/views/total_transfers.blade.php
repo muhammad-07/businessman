@@ -5,38 +5,34 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Final Report-1</div>
+                    <div class="card-header">Final Report-2</div>
 
                     <div class="card-body">
                         <div class="row"">
                                 <div class=" col-lg-12 margin-tb">
                             <div>
-                                <h3>Which bank account is used to transfer fund to each vendor</h3>
+                                <h3>Summary report of all banks with total amount transferred (in highest to lowest order)</h3>
                             </div>
 
                         </div>
                     </div>
 
                     <table class="table table-bordered">
-                        <tr>
-                            <th>#</th>
-                            <th>Vendor Name</th>
-                            <th>Amount Transffered</th>
+                        <tr>                           
                             <th>Bank A/c.ID</th>
                             <th>Bank Code</th>
                             <th>Bank Name</th>
                             <th>Acount Number</th>
+                            <th>Total Transferred</th>
                         </tr>
 
-                        @foreach ($rp1 as $value)
-                            <tr>
-                                <td>{{ ++$i }}</td>
-                                <td>{{ $value['vendor_name'] }}</td>
-                                <td>{{ $value['amount_transfered'] }}</td>
-                                <td>{{ $value['bank_ac_id'] }}</td>
-                                <td>{{ $value['bank_code'] }}</td>
-                                <td>{{ $value['bank_name'] }}</td>
+                        @foreach ($transfers as $value)
+                            <tr>                               
+                                <td>{{ $value['bid'] }}</td>
+                                <td>{{ $value['transfered_bank'] }}</td>
+                                <td>{{ $value['name'] }}</td>
                                 <td>{{ $value['ac_no'] }}</td>
+                                <td>{{ $value['sum'] }}</td>
                             </tr>
                         @endforeach
                     </table>

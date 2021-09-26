@@ -12,7 +12,6 @@ class BankAccount extends Model
         'code',
         'name',
         'ac_no',
-        'opening_balance',
-        
+        'bank_ac_id',
     ];
 }
