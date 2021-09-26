@@ -8,14 +8,14 @@
                     <div class="card-header">Final Report-2</div>
 
                     <div class="card-body">
-                        <div class="row"">
-                                <div class=" col-lg-12 margin-tb">
+                        <div class="row">
+                                
                             <div>
                                 <h3>Summary report of all banks with total amount transferred (in highest to lowest order)</h3>
                             </div>
 
                         </div>
-                    </div>
+                    
 
                     <table class="table table-bordered">
                         <tr>                           
@@ -36,7 +36,7 @@
                             </tr>
                         @endforeach
                     </table>
-
+                </div>
                 </div>
             </div>
         </div>

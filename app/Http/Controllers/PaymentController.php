@@ -14,13 +14,12 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public $opening_balance = [];
-    public $current_balance = [];
+
     public function index()
     {
         // Bank accounts
         $banks = BankAccount::all(); // getting records for calculations
-        // $opening_balance = [];
+        $opening_balance = [];
         foreach ($banks as $bank) {
             $opening_balance[$bank->code] = $bank->opening_balance;           
         }
@@ -37,33 +36,38 @@ class PaymentController extends Controller
         ->join('vendors', 'payments.code', '=', 'vendors.code')
         ->get();
         
-        $this->current_balance = $opening_balance; // copying as we want to remember opening balance
-        
+        $current_balance = $opening_balance; // copying as we want to remember opening balance
+        $remaining_payments = [];
+
         foreach ($payment_dues as $payment) {
             $transaction_bank = null; // to get which bank is used to transfer
-            if($this->current_balance[$payment->first_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
+            if($current_balance[$payment->first_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
                 
-                $this->current_balance[$payment->first_bank] -= $payment->amount;
+                $current_balance[$payment->first_bank] -= $payment->amount;
                 $transaction_bank = BankAccount::where('code', '=', $payment->first_bank)->first();    
                 // $total_transfer[$payment->first_bank];    
                 $this->trigger_transfer($payment, $payment->first_bank);
             }
-            else if($this->current_balance[$payment->second_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
+            else if($current_balance[$payment->second_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
                
-                $this->current_balance[$payment->second_bank] -= $payment->amount;
+                $current_balance[$payment->second_bank] -= $payment->amount;
                 $transaction_bank = BankAccount::where('code', '=', $payment->second_bank)->first();
                 $this->trigger_transfer($payment, $payment->second_bank);
             }
-            else if($this->current_balance[$payment->third_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
+            else if($current_balance[$payment->third_bank] >=  $payment->amount) { // we can use as we have stored bank codes in array before            
                
-                $this->current_balance[$payment->third_bank] -= $payment->amount;
+                $current_balance[$payment->third_bank] -= $payment->amount;
                 $transaction_bank = BankAccount::where('code', '=', $payment->third_bank)->first();
                 $this->trigger_transfer($payment, $payment->third_bank);
             }
             else {
-
-                // echo 'No bank had enough balance out of all 3';
-                $payment->amount = 0; //
+                // ======= RP-4  'No bank had enough balance out of all 3';
+                $remaining_payments[] = [
+                    'vendor_code' => $payment->code,
+                    'vendor_name' => $payment->name,
+                    'amount_to_transfered' => $payment->amount                    
+                ];
+                $payment->amount = 0;
             }      
             $rp1[] = [
                 'vendor_name' => $payment->name,
@@ -89,8 +93,20 @@ class PaymentController extends Controller
             
         }
 
-        
-        return view('welcome',compact('rp1', 'opening_balance', 'payment_dues'))->with('i');
+        // ==========  RP-3 available_balances
+        arsort($current_balance); // to get highest balance first
+        foreach($current_balance as $bank_code => $balance) {
+            $curr_bank = BankAccount::where('code', $bank_code)->first();
+           
+            $available_balances[] = [
+                'bank_ac_id' => $curr_bank->id,
+                'bank_name' => $curr_bank->name,
+                'ac_no' => $curr_bank->ac_no,
+                'balance' => $balance
+            ];
+        }
+
+        return view('welcome',compact('rp1', 'transfers', 'available_balances', 'remaining_payments'))->with('i');
     }
 
     /**
@@ -104,6 +120,7 @@ class PaymentController extends Controller
             'transfered_amount' => $payment->amount,
             'transfered_bank' =>  $bank
         ]);
+        // BankAccount::where('code', $bank)->decrement('opening_balance', (float)$payment->amount);
     }
 
     /**
@@ -138,11 +155,11 @@ class PaymentController extends Controller
     public function current_balance(Payment $payment)
     {
         // RP-3
-        $banks = BankAccount::all(); // getting records for calculations
+        // $banks = BankAccount::all(); // getting records for calculations
         
         
-        // return view('total_transfers',compact('banks', $this->current_balance))->with('i');
-        print_r($this->current_balance);
+        // return view('total_transfers',compact('banks', $current_balance))->with('i');
+        // print_r($current_balance);
     }
 
     /**
