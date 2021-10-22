@@ -17,11 +17,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+// Auth::routes();
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('login/', function($slug){
+    $post = cache()->remember('posts/', 5, function() {
+    });
+})->name('post');
 
-Route::get('/payments', [App\Http\Controllers\PaymentController::class, 'index'])->name('payments');
+Route::get('downloads', function() {
+    return 'Some file download';
+})->middleware('throttle:downloads');
+
+
+// Route::get('/payments', [App\Http\Controllers\PaymentController::class, 'index'])->name('payments');
 Route::get('/total_transfers', [App\Http\Controllers\PaymentController::class, 'total_transfers_by_bank'])->name('total_transfers');
 Route::get('/current_balance', [App\Http\Controllers\PaymentController::class, 'current_balance'])->name('current_balance');
 
